@@ -4,7 +4,7 @@ contract Greeter {
     string greeting;
     address owner;
     
-    constructor(string _greeting) public{
+    constructor(string _greeting) public {
         greeting = _greeting;
         owner = msg.sender;
     }
@@ -14,7 +14,7 @@ contract Greeter {
         _;
     }
     
-    function sayHello() public view returns(string){
+    function sayHello() public view returns(string) {
         if(msg.sender == owner) {
             return "Hello Daddy";
         }
@@ -22,8 +22,7 @@ contract Greeter {
             return greeting;
         }
     }
-    function setGreeting(string _newGreeting) public onlyOwner{
+    function setGreeting(string _newGreeting) public onlyOwner {
         greeting = _newGreeting;
-        
     }
 }
