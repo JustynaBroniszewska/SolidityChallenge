@@ -4,40 +4,48 @@ contract Lottery {
     uint price = 0.1 ether;
     uint userLimit = 10;
     uint public usersCount = 0;
-    address[] playersArray = new address[](userLimit);
-    uint randomNumber;
+    address[] players = new address[](userLimit);
     uint randNonce = 0;
-    uint winner;
     
-    
-    function join() public payable{
-        require(msg.value == price, "If you want join, pay 0.1 ether");
-        require(checkingUser(), "You can't take part in this lottery. ");
-        playersArray[usersCount] = msg.sender;
-        usersCount++;
+    function join() public payable oneJoinOnly validFee {
+        players[usersCount++] = msg.sender;
         if(usersCount == userLimit){
-            selectWinner();
+            rewardWinner();
+            resetLottery();
         }
     }
     
-    function checkingUser() private view returns(bool){
-        for(uint i = 0; i < playersArray.length; i++)
+    modifier validFee() {
+        require(msg.value == price, "If you want join, pay 0.1 ether"); 
+        _;
+    }
+
+    modifier oneJoinOnly() {
+        bool firstTime = true;
+        for(uint i = 0; i < players.length; i++)
         {
-            if(msg.sender == playersArray[i])
-                return false;
+            if(msg.sender == players[i])
+                firstTime = false;
         }
-        return true;
+        require(firstTime, "You can't take part in this lottery. ");
+        _;
     }
     
-    function selectWinner() private{
-        require(usersCount == 10, "Waiting for more users");
-        winner = basicRandom();
-        playersArray[winner].transfer(address(this).balance);
+    function rewardWinner() private {
+        uint winnerNumber = basicRandom();
+        players[winnerNumber].transfer(address(this).balance);
+    }
+
+    function resetLottery() private {
         usersCount = 0;
+        for(uint i = 0; i < players.length; i++)
+        {
+            players[i] = address(0);
+        }
     }
     
     function basicRandom() private returns(uint) {
-        randomNumber = uint(keccak256(abi.encodePacked(now, randNonce, blockhash(block.number-1)))) % 10;
+        uint randomNumber = uint(keccak256(abi.encodePacked(now, randNonce, blockhash(block.number-1)))) % 10;
         randNonce++;
         return randomNumber;
     }
