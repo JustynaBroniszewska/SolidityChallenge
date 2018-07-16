@@ -1,6 +1,6 @@
 pragma solidity ^0.4.22;
 
-contract Lottery {
+contract LotteryNoLimit {
     uint price = 0.1 ether;
     uint public usersCount = 0;
     uint randNonce = 0;
